@@ -1,0 +1,20 @@
+apiVersion: v2
+name: openg2p-iudx-consumer
+description: A Helm chart for OpenG2P IUDX Consumer
+type: application
+version: 0.0.0-develop
+dependencies:
+- name: common
+  repository: oci://registry-1.docker.io/bitnamicharts
+  version: 2.x.x
+home: https://openg2p.org
+keywords:
+  - openg2p
+  - IUDX
+  - subscribe
+maintainers:
+  - email: info@openg2p.org
+    name: OpenG2P
+icon: https://openg2p.github.io/openg2p-helm/openg2p-logo.png
+annotations:
+  catalog.cattle.io/display-name: "OpenG2P IUDX Consumer"

@@ -1,0 +1,4 @@
+questions:
+- variable: hostname
+  type: string
+  label: Hostname

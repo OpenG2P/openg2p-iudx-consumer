@@ -55,6 +55,7 @@ class ConsumerService(BaseService):
         and amqp_helper.consume_pending_messages().
         """
         rec = orjson.loads(body.decode())
+        self.process_record(rec)
         unq_id = self.get_unique_id_of_rec(rec)
         self.es_helper_service.put_by_id(rec, unq_id)
         channel.basic_ack(delivery_tag=method.delivery_tag)
@@ -105,6 +106,8 @@ class ConsumerService(BaseService):
                 raise
             if res.status_code != 204:
                 final_res += res.json().get("results", [])
+        for rec in final_res:
+            self.process_record(rec)
         _logger.info("Total Count of data received from Attr search APIs: %s", len(final_res))
         return final_res
 
@@ -116,3 +119,16 @@ class ConsumerService(BaseService):
 
     def get_unique_id_of_rec(self, rec: dict) -> str:
         return rec.get(_config.unique_id_field, None)
+
+    def process_record(self, rec):
+        if "incomeDetails" in rec:
+            income: str = rec["incomeDetails"].get("income")
+            hh_income: str = rec["incomeDetails"].get("total_household_income")
+            income_value = float(income.removeprefix("$")) if income else None
+            hh_income_value = float(hh_income.removeprefix("$")) if hh_income else None
+            rec["incomeDetails"]["income_value"] = income_value
+            rec["incomeDetails"]["total_household_income_value"] = hh_income_value
+        if "landInfo" in rec:
+            land_area: str = rec["landInfo"].get("total_land_area")
+            land_area_value = float(land_area.removesuffix("acres").strip()) if land_area else None
+            rec["landInfo"]["total_land_area_value"] = land_area_value

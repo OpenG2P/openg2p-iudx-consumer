@@ -40,19 +40,22 @@ class ConsumerService(BaseService):
         return self.consumer_thread.is_alive()
 
     def run_consumer_thread(self):
-        self.amqp_helper_service.configure(_config.amqp_url, _config.amqp_queue, self.on_message_callback)
+        self.amqp_helper_service.configure(
+            _config.amqp_url, _config.resource_queue_names, self.on_message_callback
+        )
         while self.do_run_consumer:
             self.amqp_helper_service.consume_pending_messages()
         self.amqp_helper_service.stop_consuming_and_close()
 
     def on_message_callback(
-        self, channel: BlockingChannel, method: Method, properties: BasicProperties, body: bytes
+        self, queue: str, channel: BlockingChannel, method: Method, properties: BasicProperties, body: bytes
     ):
         """
         This will be called on the same thread that calls amqp_helper.configure()
         and amqp_helper.consume_pending_messages().
         """
         rec = orjson.loads(body.decode())
+        self.process_record(rec)
         unq_id = self.get_unique_id_of_rec(rec)
         self.es_helper_service.put_by_id(rec, unq_id)
         channel.basic_ack(delivery_tag=method.delivery_tag)
@@ -66,12 +69,47 @@ class ConsumerService(BaseService):
         self.consumer_thread.start()
 
     def get_full_data_from_api(self) -> list[dict]:
-        res = httpx.get(
-            _config.attr_search_api_url,
-            timeout=_config.attr_search_api_timeout,
-        )
-        res.raise_for_status()
-        res = res.json().get("response", [])
+        final_res = []
+        for resource_id in _config.resource_ids:
+            res = httpx.post(
+                _config.token_api_url,
+                timeout=_config.attr_search_api_timeout,
+                json={"itemId": resource_id, "itemType": "resource", "role": "consumer"},
+                headers={
+                    "clientId": _config.consumer_client_id,
+                    "clientSecret": _config.consumer_client_secret,
+                },
+            )
+            try:
+                res.raise_for_status()
+            except Exception:
+                _logger.exception("Exception while receiving token for DX Attribute Search.", res.text)
+                raise
+            token = res.json()["results"]["accessToken"]
+            res = httpx.get(
+                _config.attr_search_api_url,
+                timeout=_config.attr_search_api_timeout,
+                params={
+                    "q": f"id=={resource_id}",
+                    "id": resource_id,
+                },
+                headers={
+                    "token": token,
+                    "accept": "application/json",
+                },
+            )
+            _logger.debug("Data received from Attr Search APIs. %s", res.text)
+            try:
+                res.raise_for_status()
+            except Exception:
+                _logger.exception("Exception during DX Attribute Search.", res.text)
+                raise
+            if res.status_code != 204:
+                final_res += res.json().get("results", [])
+        for rec in final_res:
+            self.process_record(rec)
+        _logger.info("Total Count of data received from Attr search APIs: %s", len(final_res))
+        return final_res
 
     def do_snapshot(self):
         res = self.get_full_data_from_api()
@@ -81,3 +119,16 @@ class ConsumerService(BaseService):
 
     def get_unique_id_of_rec(self, rec: dict) -> str:
         return rec.get(_config.unique_id_field, None)
+
+    def process_record(self, rec):
+        if "incomeDetails" in rec:
+            income: str = rec["incomeDetails"].get("income")
+            hh_income: str = rec["incomeDetails"].get("total_household_income")
+            income_value = float(income.removeprefix("$")) if income else None
+            hh_income_value = float(hh_income.removeprefix("$")) if hh_income else None
+            rec["incomeDetails"]["income_value"] = income_value
+            rec["incomeDetails"]["total_household_income_value"] = hh_income_value
+        if "landInfo" in rec:
+            land_area: str = rec["landInfo"].get("total_land_area")
+            land_area_value = float(land_area.removesuffix("acres").strip()) if land_area else None
+            rec["landInfo"]["total_land_area_value"] = land_area_value

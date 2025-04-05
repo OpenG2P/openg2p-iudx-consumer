@@ -1,0 +1,42 @@
+<nav class="sidebar collapsed" id="sidebar">
+    <ul class="nav-menu">
+        <li class="nav-item">
+            <a href="{{ renderer.prefix_base_url('/dashboard') }}" class="nav-link">
+                <span class="nav-icon">📊</span>
+                <span class="nav-text">Dashboard</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{{ renderer.prefix_base_url('/about') }}" class="nav-link">
+                <span class="nav-icon">📑</span>
+                <span class="nav-text">About</span>
+            </a>
+        </li>
+    </ul>
+</nav>
+<script>
+    function markActiveNavLink() {
+        const navLinks = document.querySelectorAll('.nav-link');
+        navLinks.forEach(link => {
+            if (window.location.pathname.endsWith(link.getAttribute('href'))) {
+                link.classList.add('active');
+            }
+        });
+    };
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleBtn = document.getElementById('toggleBtn');
+        const sidebar = document.getElementById('sidebar');
+        const main = document.getElementById('main');
+        const footer = document.getElementById('footer');
+
+        // Toggle sidebar when button is clicked
+        toggleBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            main.classList.toggle('nav-expanded');
+            footer.classList.toggle('nav-expanded');
+        });
+
+        // Mark nav link active based on current URL
+        markActiveNavLink();
+    });
+</script>

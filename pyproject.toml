@@ -18,6 +18,7 @@ classifiers = [
 dependencies = [
   "openg2p-fastapi-common",
   "jinja2",
+  "python-magic",
   "pika",
 ]
 dynamic = ["version"]

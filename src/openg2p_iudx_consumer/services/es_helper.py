@@ -23,6 +23,8 @@ class ESHelperService(BaseService):
             timeout=_config.es_timeout_secs,
             verify=_config.es_ssl_verify,
         )
+        if res.status_code == 404:
+            return {}
         res.raise_for_status()
         res = res.json()
         return res.get("_source", {})
@@ -31,11 +33,11 @@ class ESHelperService(BaseService):
         auth = None
         if _config.es_username:
             auth = (_config.es_username, _config.es_password)
-        res = httpx.put(
-            f"{_config.es_url}/{index}/_doc/{id}",
+        res = httpx.post(
+            f"{_config.es_url}/{index}/_update/{id}",
             auth=auth,
             timeout=_config.es_timeout_secs,
             verify=_config.es_ssl_verify,
-            json=body,
+            json={"doc": body, "doc_as_upsert": True},
         )
         res.raise_for_status()

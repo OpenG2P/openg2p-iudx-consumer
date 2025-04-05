@@ -1,7 +1,7 @@
 import logging
 from contextvars import ContextVar
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict
 
 from .config import Settings
 from .services.es_helper import ESHelperService
@@ -14,7 +14,6 @@ persist_config_registry: ContextVar["PersistentConfig"] = ContextVar("persist_co
 
 class PersistentConfig(BaseModel):
     model_config = ConfigDict(extra="allow")
-    _es_helper: ESHelperService = Field(exclude=True)
     snapshot_saved: bool = False
 
     @classmethod
@@ -30,6 +29,8 @@ class PersistentConfig(BaseModel):
         return config
 
     def save(self):
+        if not hasattr(self, "_es_helper"):
+            self._es_helper: ESHelperService = ESHelperService.get_component()
         self._es_helper.put_by_id(
             self.model_dump(mode="json"), _config.persist_config_doc_id, index=_config.persist_config_index
         )

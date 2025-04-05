@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+{% set ns = namespace(header_title=" ") %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ "Page Not Found" if input.status_code == 404  else "Error" }} | {{ config.openapi_title }}</title>
+    <link rel="icon" href="{{ renderer.prefix_base_url('/static/favicon.ico') }}" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ renderer.prefix_base_url('/static/main.css') }}">
+</head>
+<body>
+    {% include "header.html" %}
+    {% include "nav_bar.html" %}
+    <main id="main">
+        {% if input.status_code == 404 %}
+            404 Page not found.
+        {% else %}
+            Error. Code: {{ input.code }}. Message: {{ input.message }}.
+            Stack Trace:
+            {{ input.stack_trace }}
+        {% endif %}
+    </main>
+    {% include "footer.html" %}
+</body>
+</html>

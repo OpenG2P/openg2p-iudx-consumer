@@ -1,5 +1,5 @@
-from datetime import datetime, timezone
 import logging
+from datetime import datetime, timezone
 
 import httpx
 from openg2p_fastapi_common.service import BaseService
@@ -41,22 +41,13 @@ class ESHelperService(BaseService):
             timeout=_config.es_timeout_secs,
             verify=_config.es_ssl_verify,
             json={
-                "doc": {
-                    "updated_at": now,
-                    "@timestamp": now,
-                    **body
-                },
-                "upsert": {
-                    "created_at": now,
-                    "updated_at": None,
-                    "@timestamp": now,
-                    **body
-                }
+                "doc": {"updated_at": now, "@timestamp": now, **body},
+                "upsert": {"created_at": now, "updated_at": None, "@timestamp": now, **body},
             },
         )
         res.raise_for_status()
 
     def get_curr_timestamp(self) -> str:
         now = datetime.now().astimezone(tz=timezone.utc).replace(tzinfo=None)
-        now = now.isoformat(timespec="milliseconds")+"Z"
+        now = now.isoformat(timespec="milliseconds") + "Z"
         return now

@@ -79,3 +79,5 @@ docs/_build/
 # Ignore secret files and env
 .secrets.*
 .env
+.env.sr
+.env.pbms

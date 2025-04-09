@@ -10,7 +10,7 @@ from . import __version__
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="iudx_consumer_", env_file=".env", extra="allow")
 
-    openapi_title: str = "My Analytics"
+    openapi_title: str = "Humanitarian Aid Agency 1"
     openapi_description: str = """
     IUDX Consumer
     ***********************************
@@ -53,7 +53,7 @@ class Settings(BaseSettings):
     openapi_common_api_prefix: str = "/api"
 
     template_folder_path: str = "templates"
-    template_name_dashboard: str = "dashboard.html"
+    template_name_home: str = "home.html"
     template_name_about: str = "about.html"
     template_name_error: str = "error.html"
 

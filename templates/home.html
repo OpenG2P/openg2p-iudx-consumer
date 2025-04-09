@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home | {{ config.openapi_title }}</title>
+    <link rel="icon" href="{{ renderer.prefix_base_url('/static/favicon.ico') }}" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ renderer.prefix_base_url('/static/main.css') }}">
+</head>
+<body>
+    {% include "header.html" %}
+    {% include "nav_bar.html" %}
+    <main id="main">
+        <section id="home">
+            <h1>Home</h1>
+            <div class="form-container">
+                <div class="form-group">
+                    <label for="program">Program:</label>
+                    <select id="program">
+                        <option value="" disabled selected>Choose a program</option>
+                        <option value="program1">Program 1</option>
+                        <option value="program2">Program 2</option>
+                        <option value="program3">Program 3</option>
+                        <option value="program4">Program 4</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="nationalID">National ID:</label>
+                    <input type="text" id="nationalID" placeholder="Type ID">
+                </div>
+            </div>
+        </section>
+    </main>
+    {% include "footer.html" %}
+</body>
+</html>

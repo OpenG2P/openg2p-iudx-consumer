@@ -1,5 +1,4 @@
 :root {
-    --primary-blue: #1e88e5;
     --dark-blue: #1565c0;
     --sidebar-width: 250px;
     --sidebar-collapsed-width: 60px;
@@ -23,7 +22,7 @@ body {
 
 /* Header styles */
 header {
-    background-color: var(--primary-blue);
+    background-color: var(--dark-blue);
     color: white;
     height: var(--header-height);
     display: flex;
@@ -118,8 +117,8 @@ header {
 
 .nav-link.active {
     background-color: #e1f5fe;
-    color: var(--primary-blue);
-    border-left: 4px solid var(--primary-blue);
+    color: var(--dark-blue);
+    border-left: 4px solid var(--dark-blue);
 }
 
 .nav-icon {
@@ -159,13 +158,13 @@ section {
 }
 
 h1, h2 {
-    color: var(--primary-blue);
+    color: var(--dark-blue);
     margin-bottom: 15px;
 }
 
 /* Footer styles */
 footer {
-    background-color: var(--primary-blue);
+    background-color: var(--dark-blue);
     color: white;
     text-align: center;
     padding: 15px;
@@ -175,4 +174,44 @@ footer {
 
 footer.nav-expanded {
     margin-left: var(--sidebar-width);
+}
+
+.form-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+    width: 100%;
+    background-color: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    /* max-width: 600px; */
+    margin: 0 auto;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+}
+
+input, select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+select {
+    appearance: auto;
+    background-color: white;
 }

@@ -1,5 +1,5 @@
 :root {
-    --dark-blue: #1565c0;
+    --light-brown: #5a6841;
     --sidebar-width: 250px;
     --sidebar-collapsed-width: 60px;
     --header-height: 60px;
@@ -22,7 +22,7 @@ body {
 
 /* Header styles */
 header {
-    background-color: var(--dark-blue);
+    background-color: var(--light-brown);
     color: white;
     height: var(--header-height);
     display: flex;
@@ -117,8 +117,8 @@ header {
 
 .nav-link.active {
     background-color: #e1f5fe;
-    color: var(--dark-blue);
-    border-left: 4px solid var(--dark-blue);
+    color: var(--light-brown);
+    border-left: 4px solid var(--light-brown);
 }
 
 .nav-icon {
@@ -158,13 +158,13 @@ section {
 }
 
 h1, h2 {
-    color: var(--dark-blue);
+    color: var(--light-brown);
     margin-bottom: 15px;
 }
 
 /* Footer styles */
 footer {
-    background-color: var(--dark-blue);
+    background-color: var(--light-brown);
     color: white;
     text-align: center;
     padding: 15px;

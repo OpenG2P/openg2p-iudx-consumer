@@ -56,3 +56,6 @@ class TemplateRendererService(BaseService):
 
     def prefix_base_url(self, uri: str) -> str:
         return _config.ui_path_prefix + uri
+
+    def prefix_api_url(self, uri: str) -> str:
+        return _config.openapi_common_api_prefix + uri

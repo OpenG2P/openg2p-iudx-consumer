@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 
 import httpx
 import orjson
@@ -23,6 +24,9 @@ class ConsumerService(BaseService):
 
         self._amqp_helper_service: AMQPHelperService = None
         self._es_helper_service: ESHelperService = None
+
+        self.resource_tokens: dict[str, str] = {}
+        self.resource_tokens_expires_at: dict[str, datetime] = {}
 
     @property
     def amqp_helper_service(self):
@@ -66,50 +70,76 @@ class ConsumerService(BaseService):
             self.do_snapshot()
             persist_config.snapshot_saved = True
             persist_config.save()
-        self.consumer_thread.start()
+        if _config.enable_subscribe:
+            self.consumer_thread.start()
 
     def get_full_data_from_api(self) -> list[dict]:
         final_res = []
         for resource_id in _config.resource_ids:
-            res = httpx.post(
-                _config.token_api_url,
-                timeout=_config.attr_search_api_timeout,
-                json={"itemId": resource_id, "itemType": "resource", "role": "consumer"},
-                headers={
-                    "clientId": _config.consumer_client_id,
-                    "clientSecret": _config.consumer_client_secret,
-                },
-            )
-            try:
-                res.raise_for_status()
-            except Exception:
-                _logger.exception("Exception while receiving token for DX Attribute Search.", res.text)
-                raise
-            token = res.json()["results"]["accessToken"]
-            res = httpx.get(
-                _config.attr_search_api_url,
-                timeout=_config.attr_search_api_timeout,
-                params={
-                    "q": f"id=={resource_id}",
-                    "id": resource_id,
-                },
-                headers={
-                    "token": token,
-                    "accept": "application/json",
-                },
-            )
-            _logger.debug("Data received from Attr Search APIs. %s", res.text)
-            try:
-                res.raise_for_status()
-            except Exception:
-                _logger.exception("Exception during DX Attribute Search.", res.text)
-                raise
-            if res.status_code != 204:
-                final_res += res.json().get("results", [])
+            res = self.attr_search_iudx(resource_id, f"id=={resource_id}")
+            if res:
+                final_res += res
         for rec in final_res:
             self.process_record(rec)
         _logger.info("Total Count of data received from Attr search APIs: %s", len(final_res))
         return final_res
+
+    def get_iudx_resource_token(self, resource_id: str, raise_for_status=True) -> str:
+        if (
+            resource_id in self.resource_tokens_expires_at
+            and datetime.now() < self.resource_tokens_expires_at[resource_id]
+        ):
+            return self.resource_tokens[resource_id]
+        res = httpx.post(
+            _config.token_api_url,
+            timeout=_config.attr_search_api_timeout,
+            json={"itemId": resource_id, "itemType": "resource", "role": "consumer"},
+            headers={
+                "clientId": _config.consumer_client_id,
+                "clientSecret": _config.consumer_client_secret,
+            },
+        )
+        try:
+            res.raise_for_status()
+        except Exception:
+            _logger.exception("Exception while receiving token for DX Attribute Search. %s", res.text)
+            if raise_for_status:
+                raise
+            return res.json()
+        res = res.json()["results"]
+        token = res["accessToken"]
+        expires_at = datetime.fromtimestamp(res["expiry"])
+        self.resource_tokens[resource_id] = token
+        self.resource_tokens_expires_at[resource_id] = expires_at
+        return token
+
+    def attr_search_iudx(self, resource_id: str, query: str, raise_for_status=True) -> list | None:
+        token_res = self.get_iudx_resource_token(resource_id, raise_for_status=raise_for_status)
+        if isinstance(token_res, dict):
+            return token_res
+        res = httpx.get(
+            _config.attr_search_api_url,
+            timeout=_config.attr_search_api_timeout,
+            params={
+                "q": query,
+                "id": resource_id,
+            },
+            headers={
+                "token": token_res,
+                "accept": "application/json",
+            },
+        )
+        _logger.debug("Data received from Attr Search APIs. %s", res.text)
+        if res.status_code == 204:
+            return []
+        try:
+            res.raise_for_status()
+        except Exception:
+            _logger.exception("Exception during DX Attribute Search. %s", res.text)
+            if raise_for_status:
+                raise
+            return res.json()
+        return res.json()["results"]
 
     def do_snapshot(self):
         res = self.get_full_data_from_api()

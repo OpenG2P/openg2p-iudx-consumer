@@ -40,11 +40,13 @@ class Settings(BaseSettings):
     consumer_client_secret: str = ""
     resource_queue_names: list[str] = []
     resource_ids: list[str] = []
+    resource_program_names: list[str] = []
     token_api_url: str = "https://aaa.dev.openg2p.org/auth/v1/token"
     attr_search_api_url: str = "https://rs.dev.openg2p.org/ngsi-ld/v1/entities"
     attr_search_api_timeout: int = 10
 
     enable_snapshot: bool = True
+    enable_subscribe: bool = True
     unique_id_field: str = "srID"
     persist_config_index: str = ".iudx-consumer-config"
     persist_config_doc_id: int = 1
@@ -74,5 +76,6 @@ class Settings(BaseSettings):
             self.amqp_url = url
         self.es_url = self.es_url.removesuffix("/")
         self.ui_path_prefix = self.ui_path_prefix.removesuffix("/")
-        assert len(self.resource_queue_names) == len(self.resource_ids)
+        if self.enable_subscribe:
+            assert len(self.resource_queue_names) == len(self.resource_ids)
         return self

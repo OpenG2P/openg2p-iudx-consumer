@@ -1,7 +1,7 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "My Analytics",
+    "title": "OpenG2P IUDX Consumer",
     "description": "\n    IUDX Consumer\n    ***********************************\n    Further details goes here\n    ***********************************\n    ",
     "contact": {
       "url": "https://www.openg2p.org/",
@@ -74,10 +74,97 @@
           }
         }
       }
+    },
+    "/api/query": {
+      "post": {
+        "tags": [
+          "search-query"
+        ],
+        "summary": "Post Query",
+        "operationId": "post_query_api_query_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QueryAPIRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QueryAPIResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorListResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorListResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorListResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "AnyData": {
+        "properties": {},
+        "additionalProperties": true,
+        "type": "object",
+        "title": "AnyData"
+      },
       "ErrorListResponse": {
         "properties": {
           "errors": {
@@ -110,6 +197,19 @@
         "type": "object",
         "title": "ErrorResponse"
       },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
       "HealthCheckStatus": {
         "properties": {
           "status": {
@@ -122,6 +222,80 @@
           "status"
         ],
         "title": "HealthCheckStatus"
+      },
+      "QueryAPIRequest": {
+        "properties": {
+          "resource_id": {
+            "type": "string",
+            "title": "Resource Id"
+          },
+          "query": {
+            "$ref": "#/components/schemas/AnyData"
+          }
+        },
+        "type": "object",
+        "required": [
+          "resource_id",
+          "query"
+        ],
+        "title": "QueryAPIRequest"
+      },
+      "QueryAPIResponse": {
+        "properties": {
+          "result": {
+            "items": {
+              "$ref": "#/components/schemas/AnyData"
+            },
+            "type": "array",
+            "title": "Result",
+            "default": []
+          },
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AnyData"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "title": "QueryAPIResponse"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
       }
     }
   }

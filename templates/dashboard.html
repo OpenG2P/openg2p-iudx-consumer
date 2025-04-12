@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-{% set ns = namespace(header_title="Dashboard") %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ ns.header_title }} | {{ config.openapi_title }}</title>
+    <title>Dashboard | {{ config.openapi_title }}</title>
     <link rel="icon" href="{{ renderer.prefix_base_url('/static/favicon.ico') }}" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ renderer.prefix_base_url('/static/main.css') }}">
@@ -13,7 +12,10 @@
     {% include "header.html" %}
     {% include "nav_bar.html" %}
     <main id="main">
-        <iframe src="http://localhost:5601/app/dashboards#/view/64f93c30-1204-11f0-bee2-9391219f2397?embed=true&_g=(filters%3A!()%2CrefreshInterval%3A(pause%3A!f%2Cvalue%3A20000)%2Ctime%3A(from%3Anow-1y%2Cto%3Anow))&hide-filter-bar=true" height="720" width="1280"></iframe>
+        <section id="dashboard">
+            <h1>Dashboard</h1>
+            <iframe src="http://localhost:5601/app/dashboards#/view/64f93c30-1204-11f0-bee2-9391219f2397?embed=true&_g=(filters%3A!()%2CrefreshInterval%3A(pause%3A!f%2Cvalue%3A20000)%2Ctime%3A(from%3Anow-1y%2Cto%3Anow))&hide-filter-bar=true" height="720" width="1280"></iframe>
+        </section>
     </main>
     {% include "footer.html" %}
 </body>

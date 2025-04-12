@@ -26,7 +26,7 @@ class TemplateRendererService(BaseService):
         """
         Can be called on fastapi app startup.
         """
-        self.template_env.get_template(_config.template_name_home)
+        self.template_env.get_template(_config.template_name_dashboard)
         self.template_env.get_template(_config.template_name_about)
         self.template_env.get_template(_config.template_name_error)
 

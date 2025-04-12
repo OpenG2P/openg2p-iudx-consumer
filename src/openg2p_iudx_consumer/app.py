@@ -9,6 +9,7 @@ _config: Settings = Settings.get_config()
 from openg2p_fastapi_common.app import Initializer
 
 from .controllers.health import HealthController
+from .controllers.query import QueryAPIController
 from .controllers.static import StaticController
 from .controllers.ui import UIController
 from .exception_handler import ExceptionHandlerForUi
@@ -28,6 +29,7 @@ class Initializer(Initializer):
         self.consumer_service = ConsumerService()
         HealthController().post_init()
         UIController().post_init()
+        QueryAPIController().post_init()
         StaticController().post_init()
         ExceptionHandlerForUi()
 

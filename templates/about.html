@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-{% set ns = namespace(header_title="About " + config.openapi_title) %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ ns.header_title }} | {{ config.openapi_title }}</title>
+    <title>About | {{ config.openapi_title }}</title>
     <link rel="icon" href="{{ renderer.prefix_base_url('/static/favicon.ico') }}" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ renderer.prefix_base_url('/static/main.css') }}">
@@ -13,9 +12,9 @@
     {% include "header.html" %}
     {% include "nav_bar.html" %}
     <main id="main">
-        <section id="dashboard">
+        <section id="about">
             <h1>About Us</h1>
-            <p>{{ config.openapi_title }} consumes data from Farmer Registry, specifically from Farmer Data published to IUDX Data Exchange. And then display reports and dashboards with the help of Kibana.</p>
+            <p>{{ config.openapi_title }} consumes data from OpenG2P PBMS system using the IUDX Data Exchange and gives ability to perform search to check if the given person is already part of some programs.</p>
         </section>
     </main>
     {% include "footer.html" %}

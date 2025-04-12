@@ -10,7 +10,7 @@ from . import __version__
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="iudx_consumer_", env_file=".env", extra="allow")
 
-    openapi_title: str = "Humanitarian Aid Agency 1"
+    openapi_title: str = "OpenG2P IUDX Consumer"
     openapi_description: str = """
     IUDX Consumer
     ***********************************
